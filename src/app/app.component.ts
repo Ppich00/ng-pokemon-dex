@@ -1,6 +1,18 @@
 import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, combineLatest, concatMap, from, map, Observable, Subject, switchMap, tap, toArray} from "rxjs";
+import {
+  BehaviorSubject,
+  combineLatest,
+  concatMap,
+  from,
+  map,
+  Observable,
+  scan,
+  Subject,
+  switchMap,
+  tap,
+  toArray
+} from "rxjs";
 import {pokemonPaginator, pokemonResult} from "../model/pokemon";
 
 
@@ -27,9 +39,19 @@ export class AppComponent implements OnInit {
   pokemonResultList$ = this.pokemonApiList$.pipe(
     switchMap((url: string) => {
       return this.loadPokemonList(url)
-    }), tap(res => {
+    }),
+    tap(res => {
       this.urlNext$.next(res.next)
-    }), map(res => res.result));
+    }),
+    scan((acc: pokemonPaginator, value: pokemonPaginator, index: number) => {
+      if (!acc) {
+        acc = {...value};
+      } else {
+        acc.results = [...acc.results, ...value.results];
+      }
+
+      return acc
+    }));
   pokemonList: pokemonResult[] = [];
   private http = inject(HttpClient);
 
@@ -40,21 +62,11 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.pokemonResultList$.subscribe((res: pokemonResult[]) => {
-      this.pokemonList = [...this.pokemonList, ...res]
-    });
     this.loadMore$.subscribe()
   }
 
-  loadPokemonList(url: string): Observable<{ next: string, result: pokemonResult[] }> {
-    return this.http.get<pokemonPaginator>(url).pipe(
-      switchMap(res => {
-        return from(res.results).pipe(
-          concatMap(result => this.http.get<pokemonResult>(result.url)),
-          toArray(),
-          map((pokemonArr) => ({next: res.next, result: pokemonArr})))
-      })
-    )
+  loadPokemonList(url: string): Observable<pokemonPaginator> {
+    return this.http.get<pokemonPaginator>(url)
   }
 
   useIntersectionObserver(el: HTMLElement) {
@@ -76,11 +88,4 @@ export class AppComponent implements OnInit {
     })
   }
 
-  onLoad(el: HTMLImageElement) {
-    this.lastImg$.next(el);
-  }
-
-  onLoadStart() {
-    console.log('loadStart')
-  }
 }

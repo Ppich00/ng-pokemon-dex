@@ -6,12 +6,12 @@
 <div>
   <div class="w-4/5 mx-auto">
     <div class=" w-full grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8x">
-      <ng-container *ngFor="let pokemon of pokemonList ;let last = last">
+      <ng-container *ngFor="let pokemon of (pokemonResultList$| async)?.results ;let index = index">
 
         <div #parentEl
              class="grid place-content-center  rounded-md shadow-md shadow-sky-600/80 m-2 border-sky-300 border-2">
           <p class="text-center text-black text-xl">{{pokemon.name}}</p>
-          <div [appLoadingImg]="{src:pokemon.sprites.front_default,el:parentEl}" [name]="pokemon.name">
+          <div [appLoadingImg]="{index:index+1,el:parentEl}" [name]="pokemon.name" class="flex justify-center">
           </div>
         </div>
 

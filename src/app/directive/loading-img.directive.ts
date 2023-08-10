@@ -9,7 +9,7 @@ import getAverageColor from "../utils/averageColor";
   standalone: true
 })
 export class LoadingImgDirective implements OnInit {
-  @Input({required: true}) appLoadingImg: { src: string; el: HTMLDivElement; } | undefined;
+  @Input({required: true}) appLoadingImg: { index: number; el: HTMLDivElement; } | undefined;
   @Input({required: false,}) name: string = '';
 
   constructor(private el: ElementRef<HTMLImageElement>, private render: Renderer2, private vc: ViewContainerRef, private zone: NgZone) {
@@ -23,7 +23,7 @@ export class LoadingImgDirective implements OnInit {
       loadingRef.location.nativeElement
     );
     const imgEl = this.render.createElement('img');
-    imgEl.src = this.appLoadingImg?.src;
+    imgEl.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.appLoadingImg?.index}.png`;
     imgEl.hidden = true;
     imgEl.crossOrigin = `Anonymous`;
     fromEvent(imgEl, 'load').pipe(
