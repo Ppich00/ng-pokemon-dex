@@ -64,7 +64,7 @@
                 }
               ],
               "outputHashing": "all",
-              "outputPath": "docs/ng-pokemon-dex",
+              "outputPath": "docs",
               "baseHref": "ng-pokemon-dex"
             },
             "development": {
